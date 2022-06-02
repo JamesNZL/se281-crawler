@@ -109,7 +109,7 @@ const CONFIG = {
 		CONTEXT_LENGTH: 50,
 	},
 	OUTFILES: {
-		SITE: 'site.json'
+		SITE: 'site.json',
 	},
 	LOGGING: {
 		/** Whether to log 'Parsing ____' */
