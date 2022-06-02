@@ -218,4 +218,4 @@ const crawl = false;
 	inspectFile();
 })();
 
-// * run this script with node scriptkiddie.js > matches.txt
+// * run this script with node crawler.js > matches.txt
