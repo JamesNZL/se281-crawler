@@ -125,11 +125,12 @@ async function crawlUrl(url, stack) {
 
 	hrefs.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
 		.filter(isCrawlableHref)
-		.filter(href => !visitedRoutes.has(qualifySlug(href, url)))
-		.forEach(href => {
-			if (!stack.has(qualifySlug(href, url))) {
-				stack.push(qualifySlug(href, url));
-			};
+		.flatMap(href => {
+			const newUrl = qualifySlug(href, url);
+			return (visitedRoutes.has(newUrl) ? [] : [newUrl]);
+		})
+		.forEach(url => {
+			if (!stack.has(url)) stack.push(url);
 		});
 
 	return text.toLowerCase();
