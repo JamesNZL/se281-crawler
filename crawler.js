@@ -55,7 +55,7 @@ class Site {
 
 const CONFIG = {
 	HOST: 'https://softeng281.digitaledu.ac.nz',
-	START_ROUTE: '/home',
+	START_ROUTE: '/javadocs/a4/index.html',
 	REGEXES: [
 		/* 'exploit',
 		'explot',
@@ -131,7 +131,7 @@ function isCrawlableHref(href) {
 	const sameHost = href.startsWith(CONFIG.HOST);
 	const notAbsolute = href.startsWith('/');
 	const relative = href.startsWith('.') || !href.startsWith('http');
-	const anchor = href.replace('/', '').startsWith('#');
+	const anchor = href.match(/^\/?#/);
 
 	return !anchor && (sameHost || notAbsolute || relative);
 }
