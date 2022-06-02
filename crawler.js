@@ -57,7 +57,7 @@ const CONFIG = {
 	HOST: 'https://softeng281.digitaledu.ac.nz',
 	START_ROUTE: '/home',
 	REGEXES: [
-		'exploit',
+		/* 'exploit',
 		'explot',
 		'assignment',
 		'\\.txt',
@@ -80,8 +80,11 @@ const CONFIG = {
 		'answer',
 		'url',
 		'aron',
-		'ajer',
+		'ajer', */
+		'static_files'
 	],
+	/** Padding to apply either side of matched strings */
+	MATCHED_PADDING: '#######',
 	OUTFILES: {
 		SITE: 'site.json'
 	}
@@ -175,7 +178,7 @@ function inspectFile() {
 			?.flatMap(str => {
 				if (!alreadyMatched.has(str)) {
 					alreadyMatched.add(str);
-					return [str.replace(new RegExp(`(${CONFIG.REGEXES.join('|')})`, 'g'), '#####$1#####')];
+					return [str.replace(new RegExp(`(${CONFIG.REGEXES.join('|')})`, 'g'), `${CONFIG.MATCHED_PADDING}$1${CONFIG.MATCHED_PADDING}`)];
 				}
 				else return [];
 			});
