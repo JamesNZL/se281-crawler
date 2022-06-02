@@ -142,9 +142,9 @@ async function crawlSite() {
 	stack.push(`${CONFIG.HOST}${CONFIG.START_ROUTE}`);
 
 	while (!stack.isEmpty()) {
-		if (visitedRoutes.has(stack.peek())) continue;
-
 		const route = stack.pop();
+		if (visitedRoutes.has(route)) continue;
+
 		site.put(route, await crawlUrl(route, stack));
 	}
 
