@@ -131,7 +131,7 @@ function isCrawlableHref(href) {
 	const sameHost = href.startsWith(CONFIG.HOST);
 	const notAbsolute = href.startsWith('/');
 	const relative = href.startsWith('.') || !href.startsWith('http');
-	const anchor = href.match(/^\/?#/);
+	const anchor = /^\/?#/.test(href);
 
 	return !anchor && (sameHost || notAbsolute || relative);
 }
