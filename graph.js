@@ -22,7 +22,7 @@ const CONFIG = {
 
 class Graph {
 	constructor(nodes) {
-		this.outputArray = [`//${nodes.join(',')}`, 'digraph sitegraph {'];
+		this.outputArray = [`// ${nodes.join(', ')}`, 'digraph sitegraph {'];
 	}
 
 	generateOutput() {
