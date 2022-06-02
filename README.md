@@ -24,12 +24,12 @@ It also saves all crawled markup in an output `JSON` file keyed to the page rout
 
 ## Oh, you can also generate a GraphViz `DOT` file.
 
-```console
-$ node graph.js
+```bash
+node graph.js
 
 # note: the DOT file is /big/, and online tools will probably crash
 # you must have graphviz installed for this command
-$ dot graph.txt -Tsvg -o graph.svg
+dot graph.txt -Tsvg -o graph.svg
 ```
 
 ![Graph](graph/graph.svg)
