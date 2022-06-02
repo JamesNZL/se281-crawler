@@ -83,8 +83,12 @@ const CONFIG = {
 		'ajer', */
 		'static_files'
 	],
-	/** Padding to apply either side of matched strings */
-	MATCHED_PADDING: '#######',
+	MATCHED: {
+		/** Padding to apply either side of matched strings */
+		PADDING: '#######',
+		/** Amount of 'context' to include either side of matched strings */
+		CONTEXT_LENGTH: 50,
+	},
 	OUTFILES: {
 		SITE: 'site.json'
 	}
@@ -174,11 +178,11 @@ function inspectFile() {
 	Object.entries(site).forEach(([url, text]) => {
 		console.log(`Parsing page ${url}`);
 
-		const matches = text.match(new RegExp(`(.{0,50}(?:${CONFIG.REGEXES.join('|')}).{0,50})`, 'g'))
+		const matches = text.match(new RegExp(`(.{0,${CONFIG.MATCHED.CONTEXT_LENGTH}}(?:${CONFIG.REGEXES.join('|')}).{0,${CONFIG.MATCHED.CONTEXT_LENGTH}})`, 'g'))
 			?.flatMap(str => {
 				if (!alreadyMatched.has(str)) {
 					alreadyMatched.add(str);
-					return [str.replace(new RegExp(`(${CONFIG.REGEXES.join('|')})`, 'g'), `${CONFIG.MATCHED_PADDING}$1${CONFIG.MATCHED_PADDING}`)];
+					return [str.replace(new RegExp(`(${CONFIG.REGEXES.join('|')})`, 'g'), `${CONFIG.MATCHED.PADDING}$1${CONFIG.MATCHED.PADDING}`)];
 				}
 				else return [];
 			});
