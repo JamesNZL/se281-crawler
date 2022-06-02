@@ -103,12 +103,18 @@ function qualifyRoute(route, currentRoute) {
 		return `${CONFIG.HOST}${route}`;
 	}
 
-	if (!route.startsWith('http')) {
-		return `${CONFIG.HOST}/${route}`;
-	}
-
+	// * i know this works
 	if (route.startsWith('.')) {
 		return `${currentRoute}${route}`;
+	}
+
+	// TODO: fix, this is gross
+	if (!route.startsWith('http')) {
+		// remove trailing slash
+		const currentPath = currentRoute.replace(/\/$/, '').split(/\//g);
+		currentPath.pop();
+
+		return `${currentPath.join('/')}/${route}`;
 	}
 
 	// how did we get here?
@@ -118,8 +124,8 @@ function qualifyRoute(route, currentRoute) {
 
 function isCrawlableHref(href) {
 	const sameHost = href.startsWith(CONFIG.HOST);
-	const notAbsolute = href.startsWith('/') || !href.startsWith('http');
-	const relative = href.startsWith('.');
+	const notAbsolute = href.startsWith('/');
+	const relative = href.startsWith('.') || !href.startsWith('http');
 	const anchor = href.replace('/', '').startsWith('#');
 
 	return !anchor && (sameHost || notAbsolute || relative);
