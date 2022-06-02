@@ -14,6 +14,12 @@ const CONFIG = {
 		SITE: 'site.json',
 		DOTFILE: 'graph.txt',
 	},
+	FILTERS: {
+		/** A case-sensitive `string[]` of strings with which to filter out nodes containing the string */
+		STANDARD: ['feed.xml', 'javadocs', 'resources'],
+		/** Any `source`s pointing to these strings as the `target` are completely removed */
+		STRICTER: ['404'],
+	}
 };
 
 /*
@@ -23,7 +29,7 @@ const CONFIG = {
 class Graph {
 	constructor(nodes) {
 		this.outputArray = [`// ${nodes.join(', ')}`, 'digraph sitegraph {'];
-	}
+	};
 
 	generateOutput() {
 		this.outputArray.push('}');
@@ -36,15 +42,51 @@ class Graph {
 }
 
 function generateGraph() {
-	const site = JSON.parse(
+	const fullSite = JSON.parse(
 		fs.readFileSync(CONFIG.OUTFILES.SITE, { encoding: 'utf-8' })
 			.replace(new RegExp(CONFIG.HOST, 'g'), '')
 	);
 
+	const sourcesToStrictlyRemove = [];
+
+	const site = Object.fromEntries(
+		Object.entries(fullSite)
+			.flatMap(([target, { referrers: sources }]) => {
+				if (CONFIG.FILTERS.STRICTER.some(filter => target.includes(filter))) {
+					sourcesToStrictlyRemove.push(...sources);
+					return [];
+				}
+
+				if (CONFIG.FILTERS.STANDARD.some(filter => target.includes(filter))) {
+					return [];
+				}
+
+				return [[
+					target,
+					{
+						referrers: sources.filter(source => ![...CONFIG.FILTERS.STANDARD, ...CONFIG.FILTERS.STRICTER].some(filter => source.includes(filter)))
+					}
+				]];
+			})
+			// catch what we couldn't the first time around
+			.flatMap(([target, { referrers: sources }]) => {
+				if (sourcesToStrictlyRemove.includes(target)) {
+					return [];
+				}
+
+				return [[
+					target,
+					{
+						referrers: sources.filter(source => !sourcesToStrictlyRemove.some(filter => source.includes(filter)))
+					}
+				]];
+			})
+	);
+
 	const graph = new Graph([...new Set(Object.keys(site))]);
 
-	Object.entries(site).forEach(([url, { referrers }]) => {
-		referrers.forEach(source => graph.addEdge(source, url));
+	Object.entries(site).forEach(([target, { referrers: sources }]) => {
+		sources.forEach(source => graph.addEdge(source, target));
 	});
 
 	fs.writeFileSync(CONFIG.OUTFILES.DOTFILE, graph.generateOutput());
