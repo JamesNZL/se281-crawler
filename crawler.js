@@ -19,7 +19,7 @@ class Stack {
 	}
 
 	pop() {
-		visitedRoutes.add(qualifyRoute(this.array[0]));
+		visitedRoutes.add(qualifyRoute(this.array[0], null));
 		return this.array.shift();
 	}
 
@@ -93,7 +93,9 @@ const CONFIG = {
  * Helper Functions
  */
 
-function qualifyRoute(route) {
+function qualifyRoute(route, currentRoute) {
+	if (!currentRoute.endsWith('/')) currentRoute += '/';
+
 	if (route.startsWith(CONFIG.HOST)) {
 		return route;
 	}
@@ -102,12 +104,25 @@ function qualifyRoute(route) {
 		return `${CONFIG.HOST}${route}`;
 	}
 
-	// eg ../
-	return `${CONFIG.HOST}/${route}`;
+	if (route.startsWith('.')) {
+		return `${currentRoute}${route}`;
+	}
+
+	if (!route.startsWith('http')) {
+		return `${currentRoute}${route}`;
+	}
+
+	// how did we get here?
+	console.warn(`Failed to qualify route ${route}`);
+	return CONFIG.HOST;
 }
 
 function isCrawlableHref(href) {
-	return href.startsWith(CONFIG.HOST) || href.startsWith('/') || href.startsWith('.');
+	const sameHost = href.startsWith(CONFIG.HOST);
+	const relative = href.startsWith('/') || href.startsWith('.');
+	const notAbsolute = !href.startsWith('http');
+
+	return sameHost || relative || notAbsolute;
 }
 
 /*
@@ -125,10 +140,10 @@ async function crawlUrl(stack, route) {
 
 	hrefs.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
 		.filter(isCrawlableHref)
-		.filter(href => !visitedRoutes.has(qualifyRoute(href)))
+		.filter(href => !visitedRoutes.has(qualifyRoute(href, route)))
 		.forEach(href => {
-			if (!stack.has(qualifyRoute(href))) {
-				stack.push(qualifyRoute(href));
+			if (!stack.has(qualifyRoute(href, route))) {
+				stack.push(qualifyRoute(href, route));
 			};
 		});
 
