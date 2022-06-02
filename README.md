@@ -18,6 +18,6 @@ It also saves all crawled markup in an output `JSON` file keyed to the page rout
 
 3. Change `CONFIG` values
 
-4. Run at least once with `const crawler = true;`
+4. Run at least once with `CONFIG.CRAWL = true;`
 
 5. `node crawler.js > matches.txt`

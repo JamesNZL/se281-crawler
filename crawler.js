@@ -73,6 +73,8 @@ class Site {
  */
 
 const CONFIG = {
+	/** Set this to `true` to regenerate site `JSON` file */
+	CRAWL: false,
 	HOST: 'https://softeng281.digitaledu.ac.nz',
 	START_ROUTE: '/home',
 	REGEXES: [
@@ -240,11 +242,8 @@ function inspectFile() {
  * Entry Point
  */
 
-// set this to true to regenerate site json file
-const crawl = false;
-
 (async () => {
-	if (crawl) {
+	if (CONFIG.CRAWL) {
 		console.log(`Crawling ${CONFIG.HOST}...`);
 		await crawlSite();
 	}
