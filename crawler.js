@@ -55,7 +55,7 @@ class Site {
 
 const CONFIG = {
 	HOST: 'https://softeng281.digitaledu.ac.nz',
-	START_ROUTE: '/javadocs/a4/index.html',
+	START_ROUTE: '/home',
 	REGEXES: [
 		/* 'exploit',
 		'explot',
@@ -119,7 +119,13 @@ async function crawlUrl(url, stack) {
 
 	visitedRoutes.add(url);
 
-	const text = await (await fetch(url)).text();
+	let text = '';
+	try {
+		text = await (await fetch(url)).text();
+	}
+	catch (err) {
+		console.error(`Fetch error on ${url}`, { url, err });
+	}
 
 	const hrefs = text.match(/href=['"]([^"']*)['"]/g) ?? [];
 
