@@ -4,7 +4,7 @@
 
 A dirty, messy crawler I scrapped together upon being led upon a cheeky scavenger hunt by a TA.
 
-It crawls all same-host `href`'d pages starting from `CONFIG.START_ROUTE`, and parses the markup on all pages using the configured `CONFIG.REGEXES` for 'interesting' strings.
+It crawls all same-host `href`'d pages using DFS starting from `CONFIG.START_ROUTE`, and parses the markup on all pages using the configured `CONFIG.REGEXES` for 'interesting' strings.
 
 It also saves all crawled markup in an output `JSON` file keyed to the page route, so subsequent parsing can be done without re-fetching all pages.
 
