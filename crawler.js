@@ -96,7 +96,7 @@ function qualifySlug(slug, currentUrl) {
 	// strip anchor
 	slug = slug.replace(/#.*$/, '');
 
-	return new URL(slug, currentUrl);
+	return new URL(slug, currentUrl).href;
 }
 
 function isCrawlableHref(href) {
