@@ -6,6 +6,57 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 
 /*
+ * Configuration
+ */
+
+const CONFIG = {
+	/** Set this to `true` to regenerate site `JSON` file */
+	CRAWL: false,
+	HOST: 'https://softeng281.digitaledu.ac.nz',
+	START_ROUTE: '/home',
+	REGEXES: [
+		/* 'exploit',
+		'explot',
+		'assignment',
+		'\\.txt',
+		'\\.pdf',
+		'(?<!la)test',
+		'solution',
+		'soln',
+		// '\\.html',
+		'static_files',
+		'javadoc',
+		'(?<!re)source',
+		// 'src',
+		'download',
+		'\\.java',
+		'a4',
+		't2',
+		'test2',
+		'testtwo',
+		'\\.zip',
+		'answer',
+		'url',
+		'aron',
+		'ajer', */
+		'static_files'
+	],
+	MATCHED: {
+		/** Padding to apply either side of matched strings */
+		PADDING: '#######',
+		/** Amount of 'context' to include either side of matched strings */
+		CONTEXT_LENGTH: 50,
+	},
+	OUTFILES: {
+		SITE: 'site.json',
+	},
+	LOGGING: {
+		/** Whether to log 'Parsing ____' */
+		PARSING_ROUTE: false,
+	}
+};
+
+/*
  * Classes
  */
 
@@ -67,57 +118,6 @@ class Site {
 		this.object[url].text = text;
 	}
 }
-
-/*
- * Configuration
- */
-
-const CONFIG = {
-	/** Set this to `true` to regenerate site `JSON` file */
-	CRAWL: false,
-	HOST: 'https://softeng281.digitaledu.ac.nz',
-	START_ROUTE: '/home',
-	REGEXES: [
-		/* 'exploit',
-		'explot',
-		'assignment',
-		'\\.txt',
-		'\\.pdf',
-		'(?<!la)test',
-		'solution',
-		'soln',
-		// '\\.html',
-		'static_files',
-		'javadoc',
-		'(?<!re)source',
-		// 'src',
-		'download',
-		'\\.java',
-		'a4',
-		't2',
-		'test2',
-		'testtwo',
-		'\\.zip',
-		'answer',
-		'url',
-		'aron',
-		'ajer', */
-		'static_files'
-	],
-	MATCHED: {
-		/** Padding to apply either side of matched strings */
-		PADDING: '#######',
-		/** Amount of 'context' to include either side of matched strings */
-		CONTEXT_LENGTH: 50,
-	},
-	OUTFILES: {
-		SITE: 'site.json',
-	},
-	LOGGING: {
-		/** Whether to log 'Parsing ____' */
-		PARSING_ROUTE: false,
-	}
-};
 
 /*
  * Utility Functions
