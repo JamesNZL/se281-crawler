@@ -122,8 +122,18 @@ const CONFIG = {
  */
 
 function qualifySlug(slug, currentUrl) {
+	/*
+	 * Normalise urls
+	 */
+
 	// strip anchor
 	slug = slug.replace(/#.*$/, '');
+
+	// enforce no trailing slash
+	slug = slug.replace(/\/$/, '');
+
+	// remove erroneous duplicate slashes
+	slug = slug.replace(/(?<!\:)\/+/g, '/');
 
 	return new URL(slug, currentUrl).href;
 }
