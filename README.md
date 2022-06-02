@@ -2,7 +2,7 @@
 
 ## What is this?
 
-A dirty, messy crawler I scrapped together upon being led upon a cheeky scavenger hunt by a TA.
+A dirty, messy crawler I scrapped together after being led upon a cheeky scavenger hunt by a TA.
 
 It crawls all same-host `href`'d pages using DFS starting from `CONFIG.START_ROUTE`, and parses the markup on all pages using the configured `CONFIG.REGEXES` for 'interesting' strings.
 
