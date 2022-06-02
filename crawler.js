@@ -57,7 +57,7 @@ const CONFIG = {
 	HOST: 'https://softeng281.digitaledu.ac.nz',
 	START_ROUTE: '/home',
 	REGEXES: [
-		/* 'exploit',
+		'exploit',
 		'explot',
 		'assignment',
 		'\\.txt',
@@ -80,8 +80,7 @@ const CONFIG = {
 		'answer',
 		'url',
 		'aron',
-		'ajer', */
-		'\\.zip'
+		'ajer',
 	],
 	OUTFILES: {
 		SITE: 'site.json'
@@ -197,7 +196,7 @@ function inspectFile() {
  */
 
 // set this to true to regenerate site json file
-const crawl = true;
+const crawl = false;
 
 (async () => {
 	if (crawl) {
