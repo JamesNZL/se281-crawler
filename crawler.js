@@ -19,7 +19,6 @@ class Stack {
 	}
 
 	pop() {
-		visitedRoutes.add(this.array[0]);
 		return this.array.shift();
 	}
 
@@ -133,6 +132,8 @@ const visitedRoutes = new Set();
 
 async function crawlUrl(route, stack) {
 	console.log(`Fetching ${route}`);
+
+	visitedRoutes.add(route);
 
 	const text = (await (await fetch(route)).text()).toLowerCase();
 
