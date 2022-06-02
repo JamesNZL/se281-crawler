@@ -89,12 +89,10 @@ const CONFIG = {
 };
 
 /*
- * Helper Functions
+ * Utility Functions
  */
 
 function qualifySlug(slug, currentUrl) {
-	if (!currentUrl.endsWith('/')) currentUrl += '/';
-
 	if (slug.startsWith(CONFIG.HOST)) {
 		return slug;
 	}
@@ -103,6 +101,8 @@ function qualifySlug(slug, currentUrl) {
 		return `${CONFIG.HOST}${slug}`;
 	}
 
+	if (!currentUrl.endsWith('/')) currentUrl += '/';
+
 	// * i know this works
 	if (slug.startsWith('.')) {
 		return `${currentUrl}${slug}`;
@@ -110,9 +110,14 @@ function qualifySlug(slug, currentUrl) {
 
 	// TODO: fix, this is gross
 	if (!slug.startsWith('http')) {
-		// remove trailing slash
-		const currentPath = currentUrl.replace(/\/$/, '').split(/\//g);
-		currentPath.pop();
+		let currentPath = currentUrl.split(/\//g);
+
+		// handle links from eg ../../file.html
+		if (currentUrl.match(/\.html\/?$/)) {
+			// remove trailing slash if there is one
+			currentPath = currentUrl.replace(/\/$/, '').split(/\//g);
+			currentPath.pop();
+		}
 
 		return `${currentPath.join('/')}/${slug}`;
 	}
