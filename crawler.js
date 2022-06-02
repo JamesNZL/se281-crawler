@@ -91,6 +91,10 @@ const CONFIG = {
 	},
 	OUTFILES: {
 		SITE: 'site.json'
+	},
+	LOGGING: {
+		/** Whether to log 'Parsing ____' */
+		PARSING_ROUTE: false,
 	}
 };
 
@@ -176,7 +180,7 @@ function inspectFile() {
 	const site = JSON.parse(fs.readFileSync(CONFIG.OUTFILES.SITE, { encoding: 'utf-8' }));
 
 	Object.entries(site).forEach(([url, text]) => {
-		console.log(`Parsing page ${url}`);
+		if (CONFIG.LOGGING.PARSING_ROUTE) console.log(`Parsing page ${url}`);
 
 		const matches = text.match(new RegExp(`(.{0,${CONFIG.MATCHED.CONTEXT_LENGTH}}(?:${CONFIG.REGEXES.join('|')}).{0,${CONFIG.MATCHED.CONTEXT_LENGTH}})`, 'g'))
 			?.flatMap(str => {
@@ -192,9 +196,10 @@ function inspectFile() {
 			console.info(`Matched interesting strings on ${url}`);
 			console.info('================================');
 			console.info(matches.join('\n'));
+			if (!CONFIG.LOGGING.PARSING_ROUTE) console.log('\n\n');
 		}
 
-		console.log('\n\n');
+		if (CONFIG.LOGGING.PARSING_ROUTE) console.log('\n\n');
 	});
 }
 
