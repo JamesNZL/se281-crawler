@@ -92,33 +92,33 @@ const CONFIG = {
  * Helper Functions
  */
 
-function qualifyRoute(route, currentRoute) {
-	if (!currentRoute.endsWith('/')) currentRoute += '/';
+function qualifySlug(slug, currentUrl) {
+	if (!currentUrl.endsWith('/')) currentUrl += '/';
 
-	if (route.startsWith(CONFIG.HOST)) {
-		return route;
+	if (slug.startsWith(CONFIG.HOST)) {
+		return slug;
 	}
 
-	if (route.startsWith('/')) {
-		return `${CONFIG.HOST}${route}`;
+	if (slug.startsWith('/')) {
+		return `${CONFIG.HOST}${slug}`;
 	}
 
 	// * i know this works
-	if (route.startsWith('.')) {
-		return `${currentRoute}${route}`;
+	if (slug.startsWith('.')) {
+		return `${currentUrl}${slug}`;
 	}
 
 	// TODO: fix, this is gross
-	if (!route.startsWith('http')) {
+	if (!slug.startsWith('http')) {
 		// remove trailing slash
-		const currentPath = currentRoute.replace(/\/$/, '').split(/\//g);
+		const currentPath = currentUrl.replace(/\/$/, '').split(/\//g);
 		currentPath.pop();
 
-		return `${currentPath.join('/')}/${route}`;
+		return `${currentPath.join('/')}/${slug}`;
 	}
 
 	// how did we get here?
-	console.warn(`Failed to qualify route ${route}`);
+	console.warn(`Failed to qualify route ${slug}`);
 	return CONFIG.HOST;
 }
 
@@ -137,21 +137,21 @@ function isCrawlableHref(href) {
 
 const visitedRoutes = new Set();
 
-async function crawlUrl(route, stack) {
-	console.log(`Fetching ${route}`);
+async function crawlUrl(url, stack) {
+	console.log(`Fetching ${url}`);
 
-	visitedRoutes.add(route);
+	visitedRoutes.add(url);
 
-	const text = (await (await fetch(route)).text()).toLowerCase();
+	const text = (await (await fetch(url)).text()).toLowerCase();
 
 	const hrefs = text.match(/href=['"]([^"']*)['"]/g) ?? [];
 
 	hrefs.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
 		.filter(isCrawlableHref)
-		.filter(href => !visitedRoutes.has(qualifyRoute(href, route)))
+		.filter(href => !visitedRoutes.has(qualifySlug(href, url)))
 		.forEach(href => {
-			if (!stack.has(qualifyRoute(href, route))) {
-				stack.push(qualifyRoute(href, route));
+			if (!stack.has(qualifySlug(href, url))) {
+				stack.push(qualifySlug(href, url));
 			};
 		});
 
@@ -185,8 +185,8 @@ function inspectFile() {
 
 	const site = JSON.parse(fs.readFileSync(CONFIG.OUTFILES.SITE, { encoding: 'utf-8' }));
 
-	Object.entries(site).forEach(([route, text]) => {
-		console.log(`Parsing page ${route}`);
+	Object.entries(site).forEach(([url, text]) => {
+		console.log(`Parsing page ${url}`);
 
 		const matches = text.match(new RegExp(`(.{0,50}(?:${CONFIG.REGEXES.join('|')}).{0,50})`, 'g'))
 			?.flatMap(str => {
@@ -199,7 +199,7 @@ function inspectFile() {
 
 		if (matches?.length ?? false) {
 			console.info('================================');
-			console.info(`Matched interesting strings on ${route}`);
+			console.info(`Matched interesting strings on ${url}`);
 			console.info('================================');
 			console.info(matches.join('\n'));
 		}
