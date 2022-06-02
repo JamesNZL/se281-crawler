@@ -79,4 +79,3 @@ updateVersion.sh
 # Default outfiles
 site.json
 matches.txt
-graph.txt

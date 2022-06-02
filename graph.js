@@ -12,7 +12,7 @@ const CONFIG = {
 	HOST: 'https://softeng281.digitaledu.ac.nz',
 	OUTFILES: {
 		SITE: 'site.json',
-		DOTFILE: 'graph.txt',
+		DOTFILE: 'graph/graph.txt',
 	},
 	FILTERS: {
 		/** A case-sensitive `string[]` of strings with which to filter out nodes containing the string */
