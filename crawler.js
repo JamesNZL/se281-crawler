@@ -167,10 +167,12 @@ async function crawlUrl(url, stack) {
 		console.error(`Fetch error on ${url}`, { url, err });
 	}
 
-	const hrefs = (text.match(/href=['"]([^"']*)['"]/g) ?? [])
-		.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
-		.filter(isCrawlableHref)
-		.map(href => qualifySlug(href, url));
+	const hrefs = [...new Set(
+		(text.match(/href=['"]([^"']*)['"]/g) ?? [])
+			.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
+			.filter(isCrawlableHref)
+			.map(href => qualifySlug(href, url))
+	)];
 
 	hrefs.filter(url => !visitedRoutes.has(url))
 		.forEach(url => {
