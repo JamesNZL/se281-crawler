@@ -131,7 +131,7 @@ function isCrawlableHref(href) {
 
 const visitedRoutes = new Set();
 
-async function crawlUrl(stack, route) {
+async function crawlUrl(route, stack) {
 	console.log(`Fetching ${route}`);
 
 	const text = (await (await fetch(route)).text()).toLowerCase();
@@ -160,7 +160,7 @@ async function crawlSite() {
 		if (visitedRoutes.has(stack.peek())) continue;
 
 		const route = stack.pop();
-		site.put(route, await crawlUrl(stack, route));
+		site.put(route, await crawlUrl(route, stack));
 	}
 
 	fs.writeFileSync(CONFIG.OUTFILES.SITE, site.serialise());
@@ -205,7 +205,7 @@ function inspectFile() {
  */
 
 // set this to true to regenerate site json file
-const crawl = false;
+const crawl = true;
 
 (async () => {
 	if (crawl) {
