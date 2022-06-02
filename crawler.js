@@ -133,8 +133,9 @@ function isCrawlableHref(href) {
 	const notAbsolute = href.startsWith('/');
 	const relative = href.startsWith('.') || !href.startsWith('http');
 	const anchor = /^\/?#/.test(href);
+	const javascript = href.startsWith('javascript');
 
-	return !anchor && (sameHost || notAbsolute || relative);
+	return !anchor && !javascript && (sameHost || notAbsolute || relative);
 }
 
 /*
