@@ -120,8 +120,9 @@ function isCrawlableHref(href) {
 	const sameHost = href.startsWith(CONFIG.HOST);
 	const notAbsolute = href.startsWith('/') || !href.startsWith('http');
 	const relative = href.startsWith('.');
+	const anchor = href.replace('/', '').startsWith('#');
 
-	return sameHost || notAbsolute || relative;
+	return !anchor && (sameHost || notAbsolute || relative);
 }
 
 /*
