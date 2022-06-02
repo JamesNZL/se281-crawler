@@ -9,6 +9,7 @@ const fs = require('fs');
  * Configuration
  */
 
+// this should probably be made unique to each Crawler instance, but that'd be too polished for this script
 const CONFIG = {
 	/** Set this to `true` to regenerate site `JSON` file */
 	CRAWL: false,
@@ -119,90 +120,87 @@ class Site {
 	}
 }
 
-/*
- * Utility Functions
- */
+class Crawler {
+	constructor() {
+		this.visitedRoutes = new Set();
+		this.stack = new Stack();
+		this.site = new Site();
+	}
 
-function qualifySlug(slug, currentUrl) {
-	/*
-	 * Normalise urls
+	/**
+	 * Normalise URLs
+	 * @param {string} slug The slug/URL to normalise
+	 * @param {string} currentUrl The URL to use as the base
+	 * @returns {string} A normalised URL
 	 */
+	static qualifySlug(slug, currentUrl) {
+		// strip anchor
+		slug = slug.replace(/#.*$/, '');
 
-	// strip anchor
-	slug = slug.replace(/#.*$/, '');
+		// enforce no trailing slash
+		slug = slug.replace(/\/$/, '');
 
-	// enforce no trailing slash
-	slug = slug.replace(/\/$/, '');
+		// remove erroneous duplicate slashes
+		slug = slug.replace(/(?<!\:)\/+/g, '/');
 
-	// remove erroneous duplicate slashes
-	slug = slug.replace(/(?<!\:)\/+/g, '/');
-
-	return new URL(slug, currentUrl).href;
-}
-
-function isCrawlableHref(href) {
-	const sameHost = href.startsWith(CONFIG.HOST);
-	const notAbsolute = href.startsWith('/');
-	const relative = href.startsWith('.') || !href.startsWith('http');
-	const anchor = /^\/?#/.test(href);
-	const javascript = href.startsWith('javascript');
-
-	return !anchor && !javascript && (sameHost || notAbsolute || relative);
-}
-
-/*
- * Crawler
- */
-
-const visitedRoutes = new Set();
-
-async function crawlUrl(url, stack) {
-	console.log(`Fetching ${url}`);
-
-	visitedRoutes.add(url);
-
-	let text = '';
-	try {
-		text = await (await fetch(url)).text();
-	}
-	catch (err) {
-		console.error(`Fetch error on ${url}`, { url, err });
+		return new URL(slug, currentUrl).href;
 	}
 
-	const hrefs = [...new Set(
-		(text.match(/href=['"]([^"']*)['"]/g) ?? [])
-			.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
-			.filter(isCrawlableHref)
-			.map(href => qualifySlug(href, url))
-	)];
+	static crawlable(href) {
+		const sameHost = href.startsWith(CONFIG.HOST);
+		const notAbsolute = href.startsWith('/');
+		const relative = href.startsWith('.') || !href.startsWith('http');
+		const anchor = /^\/?#/.test(href);
+		const javascript = href.startsWith('javascript');
 
-	hrefs.filter(url => !visitedRoutes.has(url))
-		.forEach(url => {
-			if (!stack.has(url)) stack.push(url);
-		});
-
-	return { hrefs, text: text.toLowerCase() };
-}
-
-async function crawlSite() {
-	const stack = new Stack();
-	const site = new Site();
-
-	stack.push(`${CONFIG.HOST}${CONFIG.START_ROUTE}`);
-
-	while (!stack.isEmpty()) {
-		const route = stack.pop();
-		if (visitedRoutes.has(route)) continue;
-
-		const { hrefs, text } = await crawlUrl(route, stack);
-
-		hrefs.forEach(url => site.addUrlReferrer(url, route));
-		site.putUrlText(route, text);
+		return !anchor && !javascript && (sameHost || notAbsolute || relative);
 	}
 
-	fs.writeFileSync(CONFIG.OUTFILES.SITE, site.serialise());
+	async crawlUrl(url) {
+		console.log(`Fetching ${url}`);
 
-	console.log(`Done! Written to ${CONFIG.OUTFILES.SITE}`);
+		this.visitedRoutes.add(url);
+
+		let text = '';
+		try {
+			text = await (await fetch(url)).text();
+		}
+		catch (err) {
+			console.error(`Fetch error on ${url}`, { url, err });
+		}
+
+		const hrefs = [...new Set(
+			(text.match(/href=['"]([^"']*)['"]/g) ?? [])
+				.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
+				.filter(Crawler.crawlable)
+				.map(href => Crawler.qualifySlug(href, url))
+		)];
+
+		hrefs.filter(url => !this.visitedRoutes.has(url))
+			.forEach(url => {
+				if (!this.stack.has(url)) this.stack.push(url);
+			});
+
+		return { hrefs, text: text.toLowerCase() };
+	}
+
+	async crawlSite() {
+		this.stack.push(`${CONFIG.HOST}${CONFIG.START_ROUTE}`);
+
+		while (!this.stack.isEmpty()) {
+			const route = this.stack.pop();
+			if (this.visitedRoutes.has(route)) continue;
+
+			const { hrefs, text } = await this.crawlUrl(route, this.stack);
+
+			hrefs.forEach(url => this.site.addUrlReferrer(url, route));
+			this.site.putUrlText(route, text);
+		}
+
+		fs.writeFileSync(CONFIG.OUTFILES.SITE, this.site.serialise());
+
+		console.log(`Done! Written to ${CONFIG.OUTFILES.SITE}`);
+	}
 }
 
 /*
@@ -244,9 +242,11 @@ function inspectFile() {
 
 (async () => {
 	if (CONFIG.CRAWL) {
+		const crawler = new Crawler();
 		console.log(`Crawling ${CONFIG.HOST}...`);
-		await crawlSite();
+		await crawler.crawlSite();
 	}
+
 	inspectFile();
 })();
 
