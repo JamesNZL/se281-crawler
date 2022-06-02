@@ -103,11 +103,11 @@ function qualifyRoute(route, currentRoute) {
 		return `${CONFIG.HOST}${route}`;
 	}
 
-	if (route.startsWith('.')) {
-		return `${currentRoute}${route}`;
+	if (!route.startsWith('http')) {
+		return `${CONFIG.HOST}/${route}`;
 	}
 
-	if (!route.startsWith('http')) {
+	if (route.startsWith('.')) {
 		return `${currentRoute}${route}`;
 	}
 
@@ -118,10 +118,10 @@ function qualifyRoute(route, currentRoute) {
 
 function isCrawlableHref(href) {
 	const sameHost = href.startsWith(CONFIG.HOST);
-	const relative = href.startsWith('/') || href.startsWith('.');
-	const notAbsolute = !href.startsWith('http');
+	const notAbsolute = href.startsWith('/') || !href.startsWith('http');
+	const relative = href.startsWith('.');
 
-	return sameHost || relative || notAbsolute;
+	return sameHost || notAbsolute || relative;
 }
 
 /*
