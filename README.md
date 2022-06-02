@@ -21,3 +21,15 @@ It also saves all crawled markup in an output `JSON` file keyed to the page rout
 4. Run at least once with `CONFIG.CRAWL = true;`
 
 5. `node crawler.js > matches.txt`
+
+## Oh, you can also generate a GraphViz `DOT` file.
+
+```console
+$ node graph.js
+
+# note: the DOT file is /big/, and online tools will probably crash
+# you must have graphviz installed for this command
+$ dot graph.txt -Tsvg -o graph.svg
+```
+
+![Graph](graph/graph.svg)
