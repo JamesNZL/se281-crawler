@@ -8,11 +8,9 @@ It crawls all same-host `href`'d pages starting from `CONFIG.START_ROUTE`, and p
 
 It also saves all crawled markup in an output `JSON` file keyed to the page route, so subsequent parsing can be done without re-fetching all pages.
 
-:smiley:
-
 ## Usage
 
-> Don't. There's almost certainly better stuff out there.
+> Don't :smiley:. I'm sure there's better stuff out there.
 
 1. Fork this repo
 
