@@ -96,38 +96,7 @@ function qualifySlug(slug, currentUrl) {
 	// strip anchor
 	slug = slug.replace(/#.*$/, '');
 
-	if (slug.startsWith(CONFIG.HOST)) {
-		return slug;
-	}
-
-	if (slug.startsWith('/')) {
-		return `${CONFIG.HOST}${slug}`;
-	}
-
-	if (!currentUrl.endsWith('/')) currentUrl += '/';
-
-	// * i know this works
-	if (slug.startsWith('.')) {
-		return `${currentUrl}${slug}`;
-	}
-
-	// TODO: fix, this is gross
-	if (!slug.startsWith('http')) {
-		let currentPath = currentUrl.split(/\//g);
-
-		// handle links from eg ../../file.html
-		if (currentUrl.match(/\.html\/?$/)) {
-			// remove trailing slash if there is one
-			currentPath = currentUrl.replace(/\/$/, '').split(/\//g);
-			currentPath.pop();
-		}
-
-		return `${currentPath.join('/')}/${slug}`;
-	}
-
-	// how did we get here?
-	console.warn(`Failed to qualify route ${slug}`);
-	return CONFIG.HOST;
+	return new URL(slug, currentUrl);
 }
 
 function isCrawlableHref(href) {
