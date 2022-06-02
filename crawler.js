@@ -147,7 +147,7 @@ async function crawlUrl(url, stack) {
 
 	visitedRoutes.add(url);
 
-	const text = (await (await fetch(url)).text()).toLowerCase();
+	const text = await (await fetch(url)).text();
 
 	const hrefs = text.match(/href=['"]([^"']*)['"]/g) ?? [];
 
@@ -160,7 +160,7 @@ async function crawlUrl(url, stack) {
 			};
 		});
 
-	return text;
+	return text.toLowerCase();
 }
 
 async function crawlSite() {
