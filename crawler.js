@@ -44,8 +44,27 @@ class Site {
 		return JSON.stringify(this.object);
 	}
 
-	put(route, text) {
-		this.object[route] = text;
+	// this isn't very OOP, but it's 0030hrs
+
+	putUrl(url) {
+		if (!this.object?.[url]) {
+			this.object[url] = {
+				referrers: [],
+				text: '',
+			};
+		}
+	}
+
+	addUrlReferrer(url, referrer) {
+		this.putUrl(url);
+
+		this.object[url].referrers.push(referrer);
+	}
+
+	putUrlText(url, text) {
+		this.putUrl(url);
+
+		this.object[url].text = text;
 	}
 }
 
@@ -137,19 +156,17 @@ async function crawlUrl(url, stack) {
 		console.error(`Fetch error on ${url}`, { url, err });
 	}
 
-	const hrefs = text.match(/href=['"]([^"']*)['"]/g) ?? [];
-
-	hrefs.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
+	const hrefs = (text.match(/href=['"]([^"']*)['"]/g) ?? [])
+		.map(str => str.match(/href=['"]([^"']*)['"]/)[1]) // extract the link itself
 		.filter(isCrawlableHref)
-		.flatMap(href => {
-			const newUrl = qualifySlug(href, url);
-			return (visitedRoutes.has(newUrl) ? [] : [newUrl]);
-		})
+		.map(href => qualifySlug(href, url));
+
+	hrefs.filter(url => !visitedRoutes.has(url))
 		.forEach(url => {
 			if (!stack.has(url)) stack.push(url);
 		});
 
-	return text.toLowerCase();
+	return { hrefs, text: text.toLowerCase() };
 }
 
 async function crawlSite() {
@@ -162,7 +179,10 @@ async function crawlSite() {
 		const route = stack.pop();
 		if (visitedRoutes.has(route)) continue;
 
-		site.put(route, await crawlUrl(route, stack));
+		const { hrefs, text } = await crawlUrl(route, stack);
+
+		hrefs.forEach(url => site.addUrlReferrer(url, route));
+		site.putUrlText(route, text);
 	}
 
 	fs.writeFileSync(CONFIG.OUTFILES.SITE, site.serialise());
@@ -179,7 +199,7 @@ function inspectFile() {
 
 	const site = JSON.parse(fs.readFileSync(CONFIG.OUTFILES.SITE, { encoding: 'utf-8' }));
 
-	Object.entries(site).forEach(([url, text]) => {
+	Object.entries(site).forEach(([url, { text }]) => {
 		if (CONFIG.LOGGING.PARSING_ROUTE) console.log(`Parsing page ${url}`);
 
 		const matches = text.match(new RegExp(`(.{0,${CONFIG.MATCHED.CONTEXT_LENGTH}}(?:${CONFIG.REGEXES.join('|')}).{0,${CONFIG.MATCHED.CONTEXT_LENGTH}})`, 'g'))
