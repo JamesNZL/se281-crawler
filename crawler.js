@@ -19,7 +19,7 @@ class Stack {
 	}
 
 	pop() {
-		visitedRoutes.add(qualifyRoute(this.array[0], null));
+		visitedRoutes.add(this.array[0]);
 		return this.array.shift();
 	}
 
