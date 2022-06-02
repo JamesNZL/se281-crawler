@@ -93,6 +93,9 @@ const CONFIG = {
  */
 
 function qualifySlug(slug, currentUrl) {
+	// strip anchor
+	slug = slug.replace(/#.*$/, '');
+
 	if (slug.startsWith(CONFIG.HOST)) {
 		return slug;
 	}
