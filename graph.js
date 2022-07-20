@@ -19,7 +19,7 @@ const CONFIG = {
 		STANDARD: ['feed.xml', 'javadocs', 'resources'],
 		/** Any `source`s pointing to these strings as the `target` are completely removed */
 		STRICTER: ['404'],
-	}
+	},
 };
 
 /*
@@ -29,7 +29,7 @@ const CONFIG = {
 class Graph {
 	constructor(nodes) {
 		this.outputArray = [`// ${nodes.join(', ')}`, 'digraph sitegraph {'];
-	};
+	}
 
 	generateOutput() {
 		this.outputArray.push('}');
@@ -44,7 +44,7 @@ class Graph {
 function generateGraph() {
 	const fullSite = JSON.parse(
 		fs.readFileSync(CONFIG.OUTFILES.SITE, { encoding: 'utf-8' })
-			.replace(new RegExp(CONFIG.HOST, 'g'), '')
+			.replace(new RegExp(CONFIG.HOST, 'g'), ''),
 	);
 
 	const sourcesToStrictlyRemove = [];
@@ -64,8 +64,8 @@ function generateGraph() {
 				return [[
 					target,
 					{
-						referrers: sources.filter(source => ![...CONFIG.FILTERS.STANDARD, ...CONFIG.FILTERS.STRICTER].some(filter => source.includes(filter)))
-					}
+						referrers: sources.filter(source => ![...CONFIG.FILTERS.STANDARD, ...CONFIG.FILTERS.STRICTER].some(filter => source.includes(filter))),
+					},
 				]];
 			})
 			// catch what we couldn't the first time around
@@ -77,10 +77,10 @@ function generateGraph() {
 				return [[
 					target,
 					{
-						referrers: sources.filter(source => !sourcesToStrictlyRemove.some(filter => source.includes(filter)))
-					}
+						referrers: sources.filter(source => !sourcesToStrictlyRemove.some(filter => source.includes(filter))),
+					},
 				]];
-			})
+			}),
 	);
 
 	const graph = new Graph([...new Set(Object.keys(site))]);
